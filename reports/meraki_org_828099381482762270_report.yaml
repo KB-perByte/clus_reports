@@ -1,7 +1,7 @@
 admins_report:
   '828099381482784021':
-    apiCountResponseCode: {200: 1}
-    apiCountTotal: 1
+    apiCountResponseCode: {}
+    apiCountTotal: 0
     email: obrigg@cisco.com
     hasApiKey: true
     id: '828099381482784021'
@@ -88,8 +88,8 @@ admins_report:
     name: Nilashish
     twoFactorAuthEnabled: true
   '828099381482797290':
-    apiCountResponseCode: {200: 42, 400: 5, 404: 2}
-    apiCountTotal: 49
+    apiCountResponseCode: {200: 43, 400: 5, 404: 2}
+    apiCountTotal: 50
     email: sagpaul@redhat.com
     hasApiKey: true
     id: '828099381482797290'
