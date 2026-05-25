@@ -1,0 +1,83 @@
+name: Publish reports to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "reports/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build site
+        run: |
+          mkdir -p _site/reports
+          if compgen -G "reports/*" > /dev/null; then
+            cp -r reports/* _site/reports/
+          fi
+
+          {
+            echo '<!DOCTYPE html>'
+            echo '<html lang="en">'
+            echo '<head>'
+            echo '  <meta charset="utf-8">'
+            echo '  <meta name="viewport" content="width=device-width, initial-scale=1">'
+            echo '  <title>Clus Reports</title>'
+            echo '  <style>'
+            echo '    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; color: #1f2328; }'
+            echo '    h1 { font-size: 1.75rem; }'
+            echo '  .meta { color: #656d76; margin-bottom: 1.5rem; }'
+            echo '    ul { line-height: 2; padding-left: 1.25rem; }'
+            echo '    a { color: #0969da; text-decoration: none; }'
+            echo '    a:hover { text-decoration: underline; }'
+            echo '  </style>'
+            echo '</head>'
+            echo '<body>'
+            echo '  <h1>Clus Reports</h1>'
+            echo '  <p class="meta">Network reports published by Ansible. Updated on push to <code>main</code>.</p>'
+            echo '  <ul>'
+            found=0
+            for report in reports/*.html; do
+              [ -f "$report" ] || continue
+              found=1
+              name=$(basename "$report")
+              label=${name%.html}
+              echo "    <li><a href=\"reports/${name}\">${label}</a></li>"
+            done
+            if [ "$found" -eq 0 ]; then
+              echo '    <li>No HTML reports available yet.</li>'
+            fi
+            echo '  </ul>'
+            echo '</body>'
+            echo '</html>'
+          } > _site/index.html
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
