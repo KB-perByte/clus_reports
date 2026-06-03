@@ -8,8 +8,8 @@ admins_report:
     name: Oren Brigg
     twoFactorAuthEnabled: true
   '828099381482784024':
-    apiCountResponseCode: {}
-    apiCountTotal: 0
+    apiCountResponseCode: {200: 36, 204: 2, 400: 6, 404: 1}
+    apiCountTotal: 45
     email: fmunoz@cloverhound.com
     hasApiKey: true
     id: '828099381482784024'
@@ -88,8 +88,8 @@ admins_report:
     name: Nilashish
     twoFactorAuthEnabled: true
   '828099381482797290':
-    apiCountResponseCode: {200: 43, 400: 5, 404: 2}
-    apiCountTotal: 50
+    apiCountResponseCode: {200: 5}
+    apiCountTotal: 5
     email: sagpaul@redhat.com
     hasApiKey: true
     id: '828099381482797290'
@@ -562,6 +562,17 @@ firewalls_report:
     - {comment: Default rule, destCidr: Any, destPort: Any, policy: allow, protocol: Any,
       srcCidr: Any, srcPort: Any, syslogEnabled: false}
   L_828099381482781352: {idk_l7: N/A}
+  L_828099381482782319:
+    cellular:
+    - {comment: Default rule, destCidr: Any, destPort: Any, policy: allow, protocol: Any,
+      srcCidr: Any, srcPort: Any, syslogEnabled: false}
+    idk_l7: []
+    inbound:
+    - {comment: Default rule, destCidr: Any, destPort: Any, policy: deny, protocol: Any,
+      srcCidr: Any, srcPort: Any, syslogEnabled: false}
+    outbound:
+    - {comment: Default rule, destCidr: Any, destPort: Any, policy: allow, protocol: Any,
+      srcCidr: Any, srcPort: Any, syslogEnabled: false}
   N_828099381482854342: {idk_l7: N/A}
 networks_report:
   firewall_rules:
@@ -991,6 +1002,17 @@ networks_report:
       - {comment: Default rule, destCidr: Any, destPort: Any, policy: allow, protocol: Any,
         srcCidr: Any, srcPort: Any, syslogEnabled: false}
     L_828099381482781352: {idk_l7: N/A}
+    L_828099381482782319:
+      cellular:
+      - {comment: Default rule, destCidr: Any, destPort: Any, policy: allow, protocol: Any,
+        srcCidr: Any, srcPort: Any, syslogEnabled: false}
+      idk_l7: []
+      inbound:
+      - {comment: Default rule, destCidr: Any, destPort: Any, policy: deny, protocol: Any,
+        srcCidr: Any, srcPort: Any, syslogEnabled: false}
+      outbound:
+      - {comment: Default rule, destCidr: Any, destPort: Any, policy: allow, protocol: Any,
+        srcCidr: Any, srcPort: Any, syslogEnabled: false}
     N_828099381482854342: {idk_l7: N/A}
   network:
     L_828099381482771185:
@@ -1693,6 +1715,24 @@ networks_report:
       organizationId: '828099381482762270'
       productTypes: [switch, wireless]
       timeZone: America/Los_Angeles
+    L_828099381482782319:
+      devices: []
+      firewall_rules:
+        cellular:
+        - {comment: Default rule, destCidr: Any, destPort: Any, policy: allow, protocol: Any,
+          srcCidr: Any, srcPort: Any, syslogEnabled: false}
+        idk_l7: []
+        inbound:
+        - {comment: Default rule, destCidr: Any, destPort: Any, policy: deny, protocol: Any,
+          srcCidr: Any, srcPort: Any, syslogEnabled: false}
+        outbound:
+        - {comment: Default rule, destCidr: Any, destPort: Any, policy: allow, protocol: Any,
+          srcCidr: Any, srcPort: Any, syslogEnabled: false}
+      id: L_828099381482782319
+      name: Made With Ansible networks 2
+      organizationId: '828099381482762270'
+      productTypes: [appliance, switch, wireless]
+      timeZone: Australia/Sydney
     N_828099381482854342:
       devices: []
       firewall_rules: {idk_l7: N/A}
@@ -1720,4 +1760,4 @@ networks_report:
     L_828099381482778502: '828099381482762270', L_828099381482778505: '828099381482762270',
     L_828099381482778935: '828099381482762270', L_828099381482779318: '828099381482762270',
     L_828099381482781351: '828099381482762270', L_828099381482781352: '828099381482762270',
-    N_828099381482854342: '828099381482762270'}
+    L_828099381482782319: '828099381482762270', N_828099381482854342: '828099381482762270'}

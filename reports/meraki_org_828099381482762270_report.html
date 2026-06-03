@@ -3,489 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Automation Dashboard - Meraki Report</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <title>Ansible - Meraki Organization Report</title>
     <style>
-        :root {
-            --bg-primary: #0a0a0a;
-            --bg-secondary: #141414;
-            --bg-card: #1a1a1a;
-            --bg-elevated: #222222;
-            --border: #2e2e2e;
-            --border-subtle: #252525;
-            --text-primary: #f0f0f0;
-            --text-secondary: #a3a3a3;
-            --text-muted: #737373;
-            --accent-red: #dc2626;
-            --accent-red-bright: #ef4444;
-            --accent-red-dark: #991b1b;
-            --accent-red-glow: rgba(220, 38, 38, 0.15);
-        }
-
-        *, *::before, *::after { box-sizing: border-box; }
-
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            margin: 20px;
         }
 
-        /* Header */
-        .dashboard-header {
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a0a 50%, #141414 100%);
-            border-bottom: 2px solid var(--accent-red);
-            padding: 1.75rem 2.5rem;
-            position: sticky;
-            top: 0;
-            z-index: 200;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
-        }
-
-        .dashboard-header-inner {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .dashboard-brand {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .dashboard-logo {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--accent-red) 0%, var(--accent-red-dark) 100%);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #fff;
-            box-shadow: 0 0 20px var(--accent-red-glow);
-            flex-shrink: 0;
-        }
-
-        .dashboard-title {
-            margin: 0;
-            font-size: 1.65rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-        }
-
-        .dashboard-title span { color: var(--accent-red-bright); }
-
-        .dashboard-subtitle {
-            margin: 0.2rem 0 0;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            font-style: normal;
-            padding: 0;
-            background: none;
-            border: none;
-        }
-
-        .dashboard-meta { text-align: right; }
-
-        .dashboard-date-label {
-            display: block;
-            font-size: 0.68rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-muted);
-            margin-bottom: 0.2rem;
-        }
-
-        .dashboard-date {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .dashboard-org-id {
-            margin-top: 0.45rem;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.72rem;
-            color: var(--accent-red-bright);
-            background: var(--accent-red-glow);
-            padding: 0.2rem 0.55rem;
-            border-radius: 4px;
-            border: 1px solid rgba(220, 38, 38, 0.3);
-            display: inline-block;
-        }
-
-        .toolbar {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1rem 2.5rem 0;
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .toolbar-btn {
-            font-family: inherit;
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.4rem 0.85rem;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            background: var(--bg-card);
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: background 0.15s, border-color 0.15s, color 0.15s;
-        }
-
-        .toolbar-btn:hover {
-            background: var(--bg-elevated);
-            border-color: var(--accent-red-dark);
-            color: var(--text-primary);
-        }
-
-        /* Main layout */
-        .dashboard-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1.5rem 2.5rem 4rem;
-        }
-
-        /* Collapse panels */
-        .collapse-panel {
-            margin-bottom: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            background: var(--bg-card);
-            overflow: hidden;
-        }
-
-        .collapse-panel--section {
-            border-color: rgba(220, 38, 38, 0.35);
-            margin-bottom: 1.5rem;
-        }
-
-        .collapse-panel--network {
-            border-left: 4px solid var(--accent-red);
-            margin-left: 0.5rem;
-        }
-
-        .collapse-panel--subsection {
-            background: var(--bg-secondary);
-            border-color: var(--border-subtle);
-            margin: 0.5rem 0;
-        }
-
-        .collapse-panel--table {
-            background: var(--bg-secondary);
-            margin: 0.5rem 0;
-        }
-
-        .collapse-trigger {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.85rem 1.15rem;
-            border: none;
-            background: transparent;
-            color: var(--text-primary);
-            font-family: inherit;
-            font-size: inherit;
-            font-weight: 600;
-            text-align: left;
-            cursor: pointer;
-            transition: background 0.15s;
-        }
-
-        .collapse-trigger:hover { background: rgba(220, 38, 38, 0.08); }
-
-        .collapse-panel--section > .collapse-trigger {
-            font-size: 1.2rem;
-            padding: 1rem 1.25rem;
-            background: linear-gradient(90deg, rgba(220,38,38,0.1) 0%, transparent 100%);
-        }
-
-        .collapse-panel--network > .collapse-trigger {
-            font-size: 1rem;
-        }
-
-        .collapse-panel--subsection > .collapse-trigger,
-        .collapse-panel--table > .collapse-trigger {
-            font-size: 0.82rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            padding: 0.65rem 1rem;
-        }
-
-        .collapse-panel--table > .collapse-trigger {
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-size: 0.72rem;
-        }
-
-        .chevron {
-            width: 0;
-            height: 0;
-            border-top: 5px solid transparent;
-            border-bottom: 5px solid transparent;
-            border-left: 6px solid var(--accent-red-bright);
-            transition: transform 0.2s ease;
-            flex-shrink: 0;
-        }
-
-        .collapse-panel.open > .collapse-trigger .chevron {
-            transform: rotate(90deg);
-        }
-
-        .collapse-body {
-            display: none;
-            padding: 0 1.15rem 1.15rem;
-            border-top: 1px solid var(--border-subtle);
-        }
-
-        .collapse-panel.open > .collapse-body { display: block; }
-
-        .collapse-panel--section.open > .collapse-body { padding: 1rem 1.25rem 1.25rem; }
-
-        .collapse-count {
-            margin-left: auto;
-            font-size: 0.7rem;
-            font-weight: 500;
-            color: var(--text-muted);
-            background: var(--bg-elevated);
-            padding: 0.15rem 0.5rem;
-            border-radius: 999px;
-            border: 1px solid var(--border);
-        }
-
-        /* Legacy headings hidden when promoted to triggers */
-        h1 { display: none; }
-
-        /* Tables */
-        .table-shell {
-            border-radius: 8px;
-            border: 1px solid var(--border-subtle);
-            overflow: hidden;
-            overflow-x: auto;
+        h2 {
+            color: #333;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
         }
 
         table {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin: 0;
-            font-size: 0.875rem;
+            border-collapse: collapse;
+            margin: 10px 0;
         }
 
         th, td {
-            padding: 0.7rem 1rem;
-            text-align: left;
-            border: none;
-            border-bottom: 1px solid var(--border-subtle);
+            border: 1px solid #ddd;
+            padding: 8px;
         }
 
-        tr:last-child td, tr:last-child th { border-bottom: none; }
-
-        thead th {
-            background: linear-gradient(180deg, #2a2a2a, #1f1f1f);
-            color: var(--text-muted);
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 0.68rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            border-bottom: 2px solid var(--accent-red);
-            white-space: nowrap;
+        th {
+            background-color: #f2f2f2;
         }
 
-        tbody tr:hover td { background: rgba(220, 38, 38, 0.07); }
-        tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.018); }
-
-        td {
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            font-size: 0.84rem;
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
         }
 
-        .table-kv td:first-child {
-            width: 38%;
-            font-weight: 500;
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            background: rgba(0, 0, 0, 0.25);
-            border-right: 1px solid var(--border-subtle);
-        }
-
-        .table-kv td:last-child {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-        }
-
-        .table-nested {
-            margin: 0.3rem 0;
-            border-radius: 6px;
-            border: 1px solid var(--border-subtle);
-            background: rgba(0, 0, 0, 0.3);
-        }
-
-        .table-nested td {
-            padding: 0.4rem 0.7rem;
-            font-size: 0.76rem;
-        }
-
-        .table-nested td:first-child {
-            color: var(--text-muted);
-            font-size: 0.72rem;
-            width: 35%;
-        }
-
-        .table-nested td:last-child {
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--text-secondary);
-        }
-
-        /* Badges */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-            padding: 0.18rem 0.55rem;
-            border-radius: 999px;
-            font-size: 0.68rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-        }
-
-        .badge::before {
-            content: '';
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-        }
-
-        .badge-yes, .badge-enabled, .badge-allow {
-            background: rgba(34, 197, 94, 0.12);
-            color: #4ade80;
-            border: 1px solid rgba(34, 197, 94, 0.25);
-        }
-        .badge-yes::before, .badge-enabled::before, .badge-allow::before { background: #22c55e; }
-
-        .badge-no, .badge-disabled {
-            background: rgba(115, 115, 115, 0.15);
-            color: #a3a3a3;
-            border: 1px solid rgba(115, 115, 115, 0.3);
-        }
-        .badge-no::before, .badge-disabled::before { background: #737373; }
-
-        .badge-deny {
-            background: rgba(220, 38, 38, 0.12);
-            color: #f87171;
-            border: 1px solid rgba(220, 38, 38, 0.3);
-        }
-        .badge-deny::before { background: var(--accent-red); }
-
-        .badge-empty {
-            background: rgba(115, 115, 115, 0.08);
-            color: var(--text-muted);
-            border: 1px solid var(--border-subtle);
-            font-style: italic;
-            text-transform: none;
-            font-weight: 400;
-        }
-        .badge-empty::before { display: none; }
-
-        h5 {
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--accent-red-bright);
-            margin: 0;
-            padding: 0;
-        }
-
-        .collapse-body p {
-            color: var(--text-muted);
-            font-size: 0.875rem;
-            font-style: italic;
-            padding: 0.65rem 1rem;
-            background: var(--bg-secondary);
-            border: 1px dashed var(--border);
-            border-radius: 6px;
-            margin: 0.5rem 0;
-        }
-
+        /* Scrollable sections */
         .scrollable {
-            max-height: none;
-            overflow: visible;
-            border: none;
-            padding: 0;
-            margin: 0;
-            background: transparent;
-        }
-
-        .dashboard-footer {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1.25rem 2.5rem;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            color: var(--text-muted);
-            font-size: 0.75rem;
-        }
-
-        .dashboard-footer strong { color: var(--accent-red-bright); }
-
-        @media (max-width: 768px) {
-            .dashboard-header, .dashboard-content, .dashboard-footer, .toolbar {
-                padding-left: 1.25rem;
-                padding-right: 1.25rem;
-            }
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-
-    <header class="dashboard-header">
-        <div class="dashboard-header-inner">
-            <div class="dashboard-brand">
-                <div class="dashboard-logo">AD</div>
-                <div>
-                    <h1 class="dashboard-title">Automation Dashboard &mdash; <span>Meraki Report</span></h1>
-                    <p class="dashboard-subtitle">Cisco Meraki Organization Configuration &amp; Inventory</p>
-                </div>
-            </div>
-            <div class="dashboard-meta">
-                <span class="dashboard-date-label">Report Generated</span>
-                <div class="dashboard-date" id="report-date"></div>
-                <div class="dashboard-org-id">Org ID: 828099381482762270</div>
-            </div>
-        </div>
-    </header>
-
-    <div class="toolbar">
-        <button type="button" class="toolbar-btn" id="expand-all">Expand All</button>
-        <button type="button" class="toolbar-btn" id="collapse-all">Collapse All</button>
-    </div>
-
-    <main class="dashboard-content" id="report-root">
+    <h1>Organization Report</h1>
 
     <!-- Admins Section -->
     <h2>Administrators (16)</h2>
@@ -549,10 +110,13 @@
                 <td>fmunoz@cloverhound.com</td>
                 <td>Yes</td>
                 <td>Disabled</td>
-                <td>0</td>
+                <td>45</td>
                 <td>
-                                            No API calls
-                                    </td>
+                                                                        200: 36<br>
+                                                    400: 6<br>
+                                                    204: 2<br>
+                                                    404: 1<br>
+                                                            </td>
             </tr>
                         <tr>
                 <td>828099381482801142</td>
@@ -648,11 +212,9 @@
                 <td>sagpaul@redhat.com</td>
                 <td>Yes</td>
                 <td>Disabled</td>
-                <td>50</td>
+                <td>5</td>
                 <td>
-                                                                        200: 43<br>
-                                                    400: 5<br>
-                                                    404: 2<br>
+                                                                        200: 5<br>
                                                             </td>
             </tr>
                         <tr>
@@ -680,7 +242,7 @@
                     </table>
     
     <!-- Networks Section -->
-    <h2>Networks (39)</h2>
+    <h2>Networks (40)</h2>
                         <h3>Branch-1234 (L_828099381482771185)</h3>
             <table>
                 <tr>
@@ -6999,6 +6561,165 @@
                             <div class="scrollable">
                                                                         <p>No idk_l7 rules defined</p>
                                                             </div>
+                                <h3>Made With Ansible networks 2 (L_828099381482782319)</h3>
+            <table>
+                <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                </tr>
+                <tr>
+                    <td>ID</td>
+                    <td>L_828099381482782319</td>
+                </tr>
+                <tr>
+                    <td>Organization ID</td>
+                    <td>828099381482762270</td>
+                </tr>
+                <tr>
+                    <td>Time Zone</td>
+                    <td>Australia/Sydney</td>
+                </tr>
+                <tr>
+                    <td>Product Types</td>
+                    <td>appliance, switch, wireless</td>
+                </tr>
+            </table>
+
+            <!-- Devices Subsection -->
+            <h4>Devices (0)</h4>
+                            <p>No devices found</p>
+            
+            <!-- Firewall Rules Subsection -->
+            <h4>Firewall Rules</h4>
+                            <div class="scrollable">
+                                                                        <h5>CELLULAR Rules (1)</h5>
+                            <table>
+                                <tr>
+                                    <th>Comment</th>
+                                    <th>Details</th>
+                                </tr>
+                                                                <tr>
+                                    <td>Default rule</td>
+                                    <td>
+                                        <table>
+                                                                                        <tr>
+                                                <td>Policy:</td>
+                                                <td>allow</td>
+                                            </tr>
+                                                                                        <tr>
+                                                <td>Protocol:</td>
+                                                <td>Any</td>
+                                            </tr>
+                                                                                        <tr>
+                                                <td>Srcport:</td>
+                                                <td>Any</td>
+                                            </tr>
+                                                                                        <tr>
+                                                <td>Srccidr:</td>
+                                                <td>Any</td>
+                                            </tr>
+                                                                                        <tr>
+                                                <td>Destport:</td>
+                                                <td>Any</td>
+                                            </tr>
+                                                                                        <tr>
+                                                <td>Destcidr:</td>
+                                                <td>Any</td>
+                                            </tr>
+                                                                                        <tr>
+                                                <td>Syslog:</td>
+                                                <td>Enabled</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                                            </table>
+                                                                                                <h5>INBOUND Rules (1)</h5>
+                            <table>
+                                <tr>
+                                    <th>Comment</th>
+                                    <th>Details</th>
+                                </tr>
+                                                                <tr>
+                                    <td>Default rule</td>
+                                    <td>
+                                        <table>
+                                                                                        <tr>
+                                                <td>Policy:</td>
+                                                <td>deny</td>
+                                            </tr>
+                                                                                        <tr>
+                                                <td>Protocol:</td>
+                                                <td>Any</td>
+                                            </tr>
+                                                                                        <tr>
+                                                <td>Srcport:</td>
+                                                <td>Any</td>
+                                            </tr>
+                                                                                        <tr>
+                                                <td>Srccidr:</td>
+                                                <td>Any</td>
+                                            </tr>
+                                                                                        <tr>
+                                                <td>Destport:</td>
+                                                <td>Any</td>
+                                            </tr>
+                                                                                        <tr>
+                                                <td>Destcidr:</td>
+                                                <td>Any</td>
+                                            </tr>
+                                                                                        <tr>
+                                                <td>Syslog:</td>
+                                                <td>Enabled</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                                            </table>
+                                                                                                <h5>OUTBOUND Rules (1)</h5>
+                            <table>
+                                <tr>
+                                    <th>Comment</th>
+                                    <th>Details</th>
+                                </tr>
+                                                                <tr>
+                                    <td>Default rule</td>
+                                    <td>
+                                        <table>
+                                                                                        <tr>
+                                                <td>Policy:</td>
+                                                <td>allow</td>
+                                            </tr>
+                                                                                        <tr>
+                                                <td>Protocol:</td>
+                                                <td>Any</td>
+                                            </tr>
+                                                                                        <tr>
+                                                <td>Srcport:</td>
+                                                <td>Any</td>
+                                            </tr>
+                                                                                        <tr>
+                                                <td>Srccidr:</td>
+                                                <td>Any</td>
+                                            </tr>
+                                                                                        <tr>
+                                                <td>Destport:</td>
+                                                <td>Any</td>
+                                            </tr>
+                                                                                        <tr>
+                                                <td>Destcidr:</td>
+                                                <td>Any</td>
+                                            </tr>
+                                                                                        <tr>
+                                                <td>Syslog:</td>
+                                                <td>Enabled</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                                            </table>
+                                                                                                <p>No idk_l7 rules defined</p>
+                                                            </div>
                                 <h3>guinea pig test (N_828099381482854342)</h3>
             <table>
                 <tr>
@@ -7032,175 +6753,5 @@
                             <div class="scrollable">
                                                                         <p>No idk_l7 rules defined</p>
                                                             </div>
-    </main>
-
-    <footer class="dashboard-footer">
-        <span>Automation Dashboard &mdash; Meraki Report</span>
-        <span>Generated by <strong>Ansible</strong> &bull; <span id="footer-date"></span></span>
-    </footer>
-
-    <script>
-    (function () {
-        var now = new Date();
-        var opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-        var formatted = now.toLocaleDateString('en-US', opts);
-        document.getElementById('report-date').textContent = formatted;
-        document.getElementById('footer-date').textContent = formatted;
-
-        var BADGE_MAP = {
-            'Yes': 'yes', 'No': 'no', 'Enabled': 'enabled', 'Disabled': 'disabled',
-            'allow': 'allow', 'deny': 'deny', 'No API calls': 'empty', 'No devices found': 'empty'
-        };
-
-        function createPanel(label, level, open) {
-            var panel = document.createElement('div');
-            panel.className = 'collapse-panel collapse-panel--' + level + (open ? ' open' : '');
-            var btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'collapse-trigger';
-            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-            btn.innerHTML = '<span class="chevron" aria-hidden="true"></span><span class="collapse-label"></span>';
-            btn.querySelector('.collapse-label').textContent = label;
-            var body = document.createElement('div');
-            body.className = 'collapse-body';
-            panel.appendChild(btn);
-            panel.appendChild(body);
-            btn.addEventListener('click', function () {
-                panel.classList.toggle('open');
-                btn.setAttribute('aria-expanded', panel.classList.contains('open') ? 'true' : 'false');
-            });
-            return { panel: panel, body: body, btn: btn };
-        }
-
-        function wrapUntil(heading, stopTags, level, open) {
-            var parent = heading.parentNode;
-            var built = createPanel(heading.textContent.trim(), level, open);
-            parent.insertBefore(built.panel, heading);
-            heading.remove();
-            var sibling = built.panel.nextElementSibling;
-            while (sibling && stopTags.indexOf(sibling.tagName) === -1) {
-                var next = sibling.nextElementSibling;
-                built.body.appendChild(sibling);
-                sibling = next;
-            }
-            return built.panel;
-        }
-
-        function getTableTitle(table) {
-            var ths = table.querySelectorAll('thead th, tr:first-child th');
-            if (ths.length) {
-                return Array.from(ths).map(function (t) { return t.textContent.trim(); }).join(' · ');
-            }
-            var rows = table.querySelectorAll('tbody tr, tr');
-            return rows.length + ' row' + (rows.length === 1 ? '' : 's');
-        }
-
-        function wrapTable(table, title, open) {
-            if (table.closest('.collapse-panel--table')) return;
-            var shell = document.createElement('div');
-            shell.className = 'table-shell';
-            table.parentNode.insertBefore(shell, table);
-            shell.appendChild(table);
-            var built = createPanel(title, 'table', open !== false);
-            var count = table.querySelectorAll('tbody tr').length || table.querySelectorAll('tr').length - (table.querySelector('thead') ? 0 : 1);
-            if (count > 0) {
-                var badge = document.createElement('span');
-                badge.className = 'collapse-count';
-                badge.textContent = count + ' rows';
-                built.btn.appendChild(badge);
-            }
-            shell.parentNode.insertBefore(built.panel, shell);
-            built.body.appendChild(shell);
-        }
-
-        function enhanceTable(table) {
-            if (table.closest('td')) {
-                table.classList.add('table-nested');
-                applyBadges(table);
-                return;
-            }
-            var headerRow = table.querySelector('tr');
-            if (!headerRow) return;
-            var headers = Array.from(headerRow.querySelectorAll('th')).map(function (th) {
-                return th.textContent.trim();
-            });
-            if (headers.length === 2 && headers[0] === 'Field' && headers[1] === 'Value') {
-                table.classList.add('table-kv');
-            } else if (headers.length && !table.querySelector('thead')) {
-                var thead = document.createElement('thead');
-                thead.appendChild(headerRow);
-                table.insertBefore(thead, table.firstChild);
-                var bodyRows = Array.from(table.querySelectorAll(':scope > tr'));
-                if (bodyRows.length) {
-                    var tbody = document.createElement('tbody');
-                    bodyRows.forEach(function (r) { tbody.appendChild(r); });
-                    table.appendChild(tbody);
-                }
-            }
-            applyBadges(table);
-        }
-
-        function applyBadges(table) {
-            table.querySelectorAll('td').forEach(function (td) {
-                if (td.querySelector('table, .badge')) return;
-                var text = td.textContent.trim();
-                if (BADGE_MAP[text]) {
-                    td.innerHTML = '<span class="badge badge-' + BADGE_MAP[text] + '">' + text + '</span>';
-                }
-            });
-        }
-
-        /* 1 — Collapse h5 + table groups (firewall rule tables) */
-        document.querySelectorAll('h5').forEach(function (h5) {
-            var table = h5.nextElementSibling;
-            if (table && table.tagName === 'TABLE') {
-                var panel = createPanel(h5.textContent.trim(), 'subsection', false);
-                h5.parentNode.insertBefore(panel.panel, h5);
-                h5.remove();
-                panel.body.appendChild(table);
-            } else {
-                h5.remove();
-            }
-        });
-
-        /* 2 — Collapse h4 subsections (Devices, Firewall Rules) */
-        document.querySelectorAll('h4').forEach(function (h4) {
-            wrapUntil(h4, ['H4', 'H3', 'H2'], 'subsection', false);
-        });
-
-        /* 3 — Wrap every standalone table in its own collapsible */
-        document.querySelectorAll('table').forEach(function (table) {
-            if (table.closest('td')) return;
-            enhanceTable(table);
-            wrapTable(table, getTableTitle(table), false);
-        });
-
-        /* 4 — Collapse h3 network blocks */
-        document.querySelectorAll('h3').forEach(function (h3) {
-            wrapUntil(h3, ['H3', 'H2'], 'network', false);
-        });
-
-        /* 5 — Collapse h2 top-level sections */
-        document.querySelectorAll('h2').forEach(function (h2, i) {
-            wrapUntil(h2, ['H2'], 'section', i === 0);
-        });
-
-        /* Toolbar */
-        document.getElementById('expand-all').addEventListener('click', function () {
-            document.querySelectorAll('.collapse-panel').forEach(function (p) {
-                p.classList.add('open');
-                p.querySelector('.collapse-trigger').setAttribute('aria-expanded', 'true');
-            });
-        });
-
-        document.getElementById('collapse-all').addEventListener('click', function () {
-            document.querySelectorAll('.collapse-panel').forEach(function (p) {
-                p.classList.remove('open');
-                p.querySelector('.collapse-trigger').setAttribute('aria-expanded', 'false');
-            });
-        });
-    })();
-    </script>
-
-</body>
+                        </body>
 </html>
